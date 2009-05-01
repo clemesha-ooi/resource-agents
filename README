@@ -1,0 +1,7 @@
+This directory contains:
+    - Agents with FSM that manage their current state.
+    - Web Interface code to provide a convenient interface to Agents for development.
+
+Start both Agent Interface services (which,in turn starts each agent):
+
+    $ twistd -ny controller.py --pidfile=controller.pid & twistd -ny resource.py --pidfile=resource.pid &
