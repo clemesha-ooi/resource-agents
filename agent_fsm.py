@@ -19,15 +19,11 @@ def do_default(fsm):
      #   raise "FATAL_BLAH"
 
 def running_ok(fsm):
-    print "running_ok"
+    print "~~~ running_ok ~~~ current_state=%s" % fsm.current_state
 
 def error(fsm):
     print "==error== input_symbol=%s" % fsm.input_symbol
 
-
-f = FSM("INIT", [])
-f.set_default_transition(do_default, "INIT")
-#f.add_transition_any("INIT", None, "INIT")
 
 """
 'START' is the given Action (input_symbol)
@@ -36,19 +32,21 @@ The current_state = 'INIT' of the FSM
 (input_symbol, current_state) --> (action, next_state)
 
 """
-f.add_transition("START", "INIT", do_start, "RUNNING")
-f.add_transition("STOP", "RUNNING", do_start, "INIT")
+def create_new_fsm():
+    f = FSM("INIT", [])
+    f.set_default_transition(do_default, "INIT")
+    f.add_transition("START", "INIT", do_start, "RUNNING")
+    f.add_transition("STOP", "RUNNING", do_start, "INIT")
+    f.add_transition_list(["START", "INIT", "RELOAD", "RESTART"], "RUNNING", running_ok, "RUNNING")
+    return f
 
-f.add_transition_list(["START", "INIT", "RELOAD", "RESTART"], "RUNNING", running_ok, "RUNNING")
-
-#print f.process("INIT")
-#print "\n\n\n"
-#print f.process("START")
 
 
 STATES = ["UN_INIT" "RUNNING", "STOPPED" "ERROR"]
 ACTIONS = ["INIT", "START", "STOP", "RELOAD", "RESTART", "RUN_SCRIPT", "BLAH_BLAH", "FATAL_BLAH"]
+"""
 while 1:
     time.sleep(2)
     action = random.choice(ACTIONS)
     print "\nACTION=>",action, " - process=>",f.process(action)
+"""
