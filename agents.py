@@ -34,7 +34,7 @@ class BaseFSMAgent(pole.BasePole):
         pass them to this Agent's FSM to be handled.
 
         """
-        print "updating '%s' ... state=%s" % (self.__class__.__name__, self.state)
+        # print "updating '%s' ... state=%s" % (self.__class__.__name__, self.state)
         try:
             action = self.state.pop()
             print "pop action=>'%s'" % action
