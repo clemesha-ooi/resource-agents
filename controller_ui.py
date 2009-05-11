@@ -43,6 +43,20 @@ class ControllerAgentUI(resource.Resource):
 
     def render_GET(self, request):
         #role = request.args.get("role", ["Control"])[0]
+        m = request.args.get("cmd", [None])[0]
+        to = request.args.get("to", [None])[0]
+        if m == 'say':
+            to_say = request.args.get("say")[0]
+            self.agent.role_collection.getServiceNamed('DemoRole').say(to, to_say)
+            return 'said '+m
+        elif m == 'disk':
+            self.agent.role_collection.getServiceNamed('DemoRole').get_disk(to)
+            return 'disk'
+        elif m == 'volume':
+            level = request.args.get("level")[0]
+            self.agent.role_collection.getServiceNamed('DemoRole').set_volume(to, level)
+            return 'volume'
+
         registry = self.agent.role_collection.getServiceNamed("Agent Control").registry
         return str(registry)
 
@@ -95,7 +109,7 @@ demo_role = controller.DemoRole()
 c_agent = pole.Agent("agents", "Controller") #(exchange, resource)
 c_agent.addRole(agent_controller)
 c_agent.addRole(demo_role)
-c_agent.addAgentContact('osx-agent', ('agents', 'osx-agent',))
+c_agent.addAgentContact('osx-agent', ('agents', 'osx-agent'))
 
 c_manlay = field.ChannelManagementLayer()
 c_manlay.addAgent(c_agent)

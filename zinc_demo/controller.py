@@ -88,8 +88,12 @@ class AgentController(pole.Role):
         self.sendMessage(agent_id, payload) 
 
     def action_heartbeat(self, message_object):
+        """XXX fix anon heartbeat
+        """
         agent_id = message_object['agent_id']
-        agent = self.registry[agent_id]
+        agent = self.registry.get(agent_id, None)
+        if agent is None:
+            agent = ManagedAgent('anon', agent_id)
         agent.touch()
 
     def action_disk_usage(self, message_object):

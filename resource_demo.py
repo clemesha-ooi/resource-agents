@@ -44,7 +44,7 @@ demo_role = agent_roles.DemoRole()
 
 EXCHANGE = 'agents'
 # EXCHANGE = 'magnet'
-RESOURCE = 'apple'
+RESOURCE = 'osx-agent'
 
 macAgent = pole.Agent(EXCHANGE, RESOURCE, unique_id=unique_id)
 # macAgent.addRole(say_role)
