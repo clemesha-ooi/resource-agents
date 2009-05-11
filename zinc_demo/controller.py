@@ -21,6 +21,7 @@ Hello Message:
 """
 import os
 import sys
+import time
 
 from twisted.python import log
 from twisted.internet import reactor
@@ -49,6 +50,7 @@ class ManagedAgent(object):
         """touch heartbeat timestamp
         """
         self.last_heartbeat = time.time()
+        log.msg('Managed Agent %s %s Touch' % (self.name, self.id))
 
 
 class AgentController(pole.Role):
@@ -77,6 +79,8 @@ class AgentController(pole.Role):
 
     def action_heartbeat(self, message_object):
         agent_id = message_object['agent_id']
+        agent = self.registry[agent_id]
+        agent.touch()
 
     def action_disk_usage(self, message_object):
         agent = self.registry.get(message_object['agent_id'])
