@@ -29,7 +29,7 @@ from twisted.python import log
 from twisted.internet import reactor
 from twisted.internet.utils import getProcessOutput
 
-log.startLogging(sys.stdout)
+# log.startLogging(sys.stdout)
 
 from magnet import pole
 from magnet import field

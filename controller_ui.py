@@ -11,6 +11,9 @@ import simplejson as json
 from twisted.application import service, internet
 from twisted.web import resource, server, static
 from twisted.internet import reactor
+from twisted.python import log
+
+# log.startLogging(sys.stdout)
 
 from agent_roles import Say, Disk
 from zinc_demo import controller
@@ -92,9 +95,9 @@ demo_role = controller.DemoRole()
 c_agent = pole.Agent("agents", "Controller") #(exchange, resource)
 c_agent.addRole(agent_controller)
 c_agent.addRole(demo_role)
+c_agent.addAgentContact('osx-agent', ('agents', 'osx-agent',))
 
 c_manlay = field.ChannelManagementLayer()
-c_manlay.addAgentContact('osx-agent', ('agents', 'osx-agent',))
 c_manlay.addAgent(c_agent)
 c_connector = field.AMQPConnector(c_manlay, host='amoeba.ucsd.edu', spec_path=SPEC)
 #c_connector.connect()

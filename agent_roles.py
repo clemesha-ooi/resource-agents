@@ -59,7 +59,7 @@ class DemoRole(pole.Role):
         say = "Hello %s.  Your resource has %d gigabytes free disk, and %d used." % (name, free, used)
         log.msg("action_disk - say:%s" % say)
         result = yield getProcessOutput('/usr/bin/say', ['-v', VOICE, say])
-        reply = {'method': 'reply', 'free':free, 'used':used}
+        reply = {'method':'report_disk', 'payload':{'free':free, 'used':used}}
         self.sendMessage("Controller", reply)
 
     @defer.inlineCallbacks
@@ -68,16 +68,16 @@ class DemoRole(pole.Role):
         value = message_object["payload"]
         result = yield volume.set_volume(value)
         log.msg("action_set_volume - result: %s" % result)
-        reply = {'method': 'reply', 'payload': 'ok'}
-        self.sendMessage("Controller", reply)
+        # reply = {'method': 'reply', 'payload': 'ok'}
+        # self.sendMessage("Controller", reply)
 
     @defer.inlineCallbacks
     def action_say(self, message_object):
         to_say = message_object['payload']
         log.msg('action_say - to_say: %s' % to_say)
         result = yield getProcessOutput('/usr/bin/say', ['-v', VOICE, to_say])
-        reply = {'method': 'reply', 'payload': 'ok'}
-        self.sendMessage("Controller", reply)
+        # reply = {'method': 'reply', 'payload': 'ok'}
+        # self.sendMessage("Controller", reply)
 
 
 
