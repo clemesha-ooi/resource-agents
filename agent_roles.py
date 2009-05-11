@@ -11,7 +11,7 @@ from magnet import field
 
 from osx_resource import disk_space
 
-class Say(pole.Role):
+class Say(pole.ResourceCapability):
     """
     """
     def sendOK(self, result):
@@ -30,7 +30,7 @@ class Say(pole.Role):
         return None
 
 
-class Disk(pole.Role):
+class Disk(pole.ResourceMonitorRole):
     def sendOK(self, result):
         reply = {'method': 'reply', 'payload': 'ok'}
         self.sendMessage(reply, 'test')

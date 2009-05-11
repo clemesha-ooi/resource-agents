@@ -113,20 +113,30 @@ class Root(resource.Resource):
 # --- new agent ----
 
 
-say_role = Say('C')
-disk_role = Disk('M')
+say_role = Say()
+disk_role = Disk()
+r_agent_control_role = pole.AgentControl()
 
 r_agent = pole.Agent(X, "osx") #(exchange, resource)
+
 r_agent.addRole(say_role)
 r_agent.addRole(disk_role)
+r_agent.addAgentContact('Controller', ('agents', 'Controller'))
+r_agent.addRole(r_agent_control_role)
+
 r_manlay = field.ChannelManagementLayer()
 r_manlay.addAgent(r_agent)
 r_connector = field.AMQPConnector(r_manlay, host='amoeba.ucsd.edu', spec_path=SPEC)
 r_connector.connect()
 
+
+c_agent_control_role = pole.AgentControl()
 c_agent = pole.Agent(X, "osx") #(exchange, resource)
 c_agent.addRole(say_role)
 c_agent.addRole(disk_role)
+c_agent.addAgentContact('Controller', ('agents', 'Controller'))
+c_agent.addRole(c_agent_control_role)
+
 c_manlay = field.ChannelManagementLayer()
 c_manlay.addAgent(c_agent)
 c_connector = field.AMQPConnector(c_manlay, host='amoeba.ucsd.edu', spec_path=SPEC)
