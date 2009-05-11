@@ -89,15 +89,16 @@ class AgentController(pole.Role):
         agent.set_diskusage(message_object['payload'])
 
 
-agent_controller = AgentController()
+if __name__ == "__main__":
+    agent_controller = AgentController()
 
-controller_agent = pole.Agent(EXCHANGE, RESOURCE)
-controller_agent.addRole(agent_controller)
+    controller_agent = pole.Agent(EXCHANGE, RESOURCE)
+    controller_agent.addRole(agent_controller)
 
-ams = field.ChannelManagementLayer()
-ams.addAgent(controller_agent)
-amqpConnector = field.AMQPConnector(ams, host='amoeba.ucsd.edu',
-        spec_path=spec_path_def)
+    ams = field.ChannelManagementLayer()
+    ams.addAgent(controller_agent)
+    amqpConnector = field.AMQPConnector(ams, host='amoeba.ucsd.edu',
+            spec_path=spec_path_def)
 
-amqpConnector.connect()
-reactor.run()
+    amqpConnector.connect()
+    reactor.run()
