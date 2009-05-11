@@ -87,16 +87,17 @@ class Root(resource.Resource):
 
 
 agent_controller = controller.AgentController()
+demo_role = controller.DemoRole()
 
 c_agent = pole.Agent("agents", "Controller") #(exchange, resource)
 c_agent.addRole(agent_controller)
+c_agent.addRole(demo_role)
 
-print "111111111111"
 c_manlay = field.ChannelManagementLayer()
+c_manlay.addAgentContact('osx-agent', ('agents', 'osx-agent',))
 c_manlay.addAgent(c_agent)
 c_connector = field.AMQPConnector(c_manlay, host='amoeba.ucsd.edu', spec_path=SPEC)
 #c_connector.connect()
-print "22222222222222"
 
 
 # === Web Interface ===
