@@ -12,7 +12,7 @@ from twisted.application import service, internet
 from twisted.web import resource, server, static
 from twisted.internet import reactor
 
-from agent_roles import Say, Disk
+from agent_roles import Say, Disk, DemoRole
 
 HOST = "amoeba.ucsd.edu"
 SPEC = "../magnet/magnet/spec/amqp0-8.xml"
@@ -115,12 +115,14 @@ class Root(resource.Resource):
 
 say_role = Say()
 disk_role = Disk()
+demo_role = DemoRole()
 r_agent_control_role = pole.AgentControl()
 
 r_agent = pole.Agent(X, "osx") #(exchange, resource)
 
 r_agent.addRole(say_role)
 r_agent.addRole(disk_role)
+r_agent.addRole(demo_role)
 r_agent.addAgentContact('Controller', ('agents', 'Controller'))
 r_agent.addRole(r_agent_control_role)
 
@@ -132,6 +134,7 @@ r_connector.connect()
 
 c_agent_control_role = pole.AgentControl()
 c_agent = pole.Agent(X, "osx") #(exchange, resource)
+c_agent.addRole(demo_role)
 c_agent.addRole(say_role)
 c_agent.addRole(disk_role)
 c_agent.addAgentContact('Controller', ('agents', 'Controller'))

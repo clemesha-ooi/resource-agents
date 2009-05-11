@@ -44,6 +44,7 @@ class Volume(object):
         value = self._check_value_with_contract(value)
         if isinstance(value, self.contract["type"]):
             result = yield getProcessOutput(self.set_cmd, [self.set_cmdflag, self.set_cmdval % value])
+            defer.returnValue(value)
         else:
             raise ValueError, value
 
