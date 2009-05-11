@@ -12,14 +12,14 @@ from twisted.application import service, internet
 from twisted.web import resource, server, static
 from twisted.internet import reactor
 
-from agents import ResourceAgent, ControllerAgent
+from agent_roles import Say, Disk
 
 HOST = "amoeba.ucsd.edu"
 SPEC = "../magnet/magnet/spec/amqp0-8.xml"
 
 
 VH = "/resource_agents" #vhost
-X = "webservers" #exchange
+X = "ui" #exchange
 RP = "*" #routing_pattern
 SYS = "resource_agents" #system_name
 SER = "resource" #service_name 
@@ -38,15 +38,15 @@ class ResourceAgentUI(resource.Resource):
         return resource.Resource.getChild(self, name, request)
 
     def render_GET(self, request):
-        method = request.args.get("method", ["hello"])[0]
-        action = request.args.get("action", ["INIT"])[0]
-        action = action.upper()
+        role = request.args.get("role", ["Control"])[0]
+        method = request.args.get("method", ["say"])[0]
+        payload = request.args.get("payload", ["hello world"])[0]
 
-        payload = {"from":self.__class__.__name__, "action":action}
-        msgobj = {"method":method, "payload":payload}
+        role_payload = {"from":self.__class__.__name__, "method":method, "payload":payload}
+        msgobj = {"role":role, "payload":role_payload}
         #print "Sending msg => '%s'" % msgobj
-        self.service.sendMessage(msgobj, "webui")
-        return "Action=> %s " % action
+        self.service.consume_message(msgobj)
+        return "{'method':%s, 'payload':%s}" % (method, payload)
 
 class ControllerAgentUI(resource.Resource):
 
@@ -60,15 +60,15 @@ class ControllerAgentUI(resource.Resource):
         return resource.Resource.getChild(self, name, request)
 
     def render_GET(self, request):
-        method = request.args.get("method", ["hello"])[0]
-        action = request.args.get("action", ["INIT"])[0]
-        action = action.upper()
+        role = request.args.get("role", ["Control"])[0]
+        method = request.args.get("method", ["say"])[0]
+        payload = request.args.get("payload", ["hello world"])[0]
 
-        payload = {"from":self.__class__.__name__, "action":action}
-        msgobj = {"method":method, "payload":payload}
+        role_payload = {"from":self.__class__.__name__, "method":method, "payload":payload}
+        msgobj = {"role":role, "payload":role_payload}
         #print "Sending msg => '%s'" % msgobj
-        self.service.sendMessage(msgobj, "webui")
-        return "Action=> %s " % action
+        self.service.consume_message(msgobj)
+        return "{'method':%s, 'payload':%s}" % (method, payload)
 
 class Root(resource.Resource):
     isLeaf = False
@@ -110,22 +110,43 @@ class Root(resource.Resource):
         return html
 
 
+# --- new agent ----
 
-# === Agents ===
-r_agent = ResourceAgent(exchange=X, routing_pattern="*", system_name="resource", service_name=SER, token=r_T)
-r_connector = field.AMQPClientConnectorService(reactor, field.IAMQPClient(r_agent), name="r_agent")
-r_connector.connect(host=HOST, vhost=VH, spec_path=SPEC)
 
-c_agent = ControllerAgent(exchange=X, routing_pattern="controller", system_name="controller", service_name=SER, token=c_T)
-c_connector = field.AMQPClientConnectorService(reactor, field.IAMQPClient(c_agent), name="c_agent")
-c_connector.connect(host=HOST, vhost=VH, spec_path=SPEC)
-#================
+say_role = Say()
+disk_role = Disk()
+r_agent_control_role = pole.AgentControl()
+
+r_agent = pole.Agent(X, "osx") #(exchange, resource)
+
+r_agent.addRole(say_role)
+r_agent.addRole(disk_role)
+r_agent.addAgentContact('Controller', ('agents', 'Controller'))
+r_agent.addRole(r_agent_control_role)
+
+r_manlay = field.ChannelManagementLayer()
+r_manlay.addAgent(r_agent)
+r_connector = field.AMQPConnector(r_manlay, host='amoeba.ucsd.edu', spec_path=SPEC)
+r_connector.connect()
+
+
+c_agent_control_role = pole.AgentControl()
+c_agent = pole.Agent(X, "osx") #(exchange, resource)
+c_agent.addRole(say_role)
+c_agent.addRole(disk_role)
+c_agent.addAgentContact('Controller', ('agents', 'Controller'))
+c_agent.addRole(c_agent_control_role)
+
+c_manlay = field.ChannelManagementLayer()
+c_manlay.addAgent(c_agent)
+c_connector = field.AMQPConnector(c_manlay, host='amoeba.ucsd.edu', spec_path=SPEC)
+c_connector.connect()
 
 
 # === Web Interface ===
 webui = Root()
-webui.putChild('resource', ResourceAgentUI(r_connector))
-webui.putChild('controller', ControllerAgentUI(c_connector))
+webui.putChild('resource', ResourceAgentUI(r_agent))
+webui.putChild('controller', ControllerAgentUI(c_agent))
 webui.putChild('static', static.File(os.path.join(os.path.abspath("."), "static")))
 
 webuisite = internet.TCPServer(8008, server.Site(webui))

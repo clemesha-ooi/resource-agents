@@ -1,7 +1,20 @@
-This directory contains:
-    - Agents with FSM that manage their current state.
-    - Web Interface code to provide a convenient interface to Agents for development.
+Introduction
+=============
+- Agents with FSM that manage their current state.
+- Web Interface code to provide a convenient interface to Agents for development.
+
+
+Dependancies
+============
+twisted
+simplejson
+txAMQP
+Magnet
+
+
+How to run
+==========
 
 Start Agent User Interface services (which, in turn, starts each agent):
-
-    $ twistd -ny ui.py
+------------------------------------------------------------------------
+$ twistd -ny ui.py #now go to http://localhost:8008
