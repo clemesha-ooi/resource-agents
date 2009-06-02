@@ -18,3 +18,8 @@ How to run
 Start Agent User Interface services (which, in turn, starts each agent):
 ------------------------------------------------------------------------
 $ twistd -ny ui.py #now go to http://localhost:8008
+
+
+Examples
+========
+The 'zinc_demo' directory contains example osx agent code
